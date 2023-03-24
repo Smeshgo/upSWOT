@@ -80,7 +80,12 @@ namespace upSWOT.Service
             
             foreach (var character in characters)
             {
-                var location = await Get<LocationResponse>(character.Origin.Url);
+                var location = new LocationResponse();
+                if (!string.IsNullOrWhiteSpace(character.Origin.Url))
+                {
+                    location = await Get<LocationResponse>(character.Origin.Url);
+                }
+                
                 result.Add(new PersonDto(
                         character.Name,
                         character.Status,
