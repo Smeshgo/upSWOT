@@ -1,43 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
+using upSWOT.Models;
+using upSWOT.Service;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace upSWOT.Controllers
 {
-    [Route("/api/v1/[controller]")]
+    [Route("/api/v1/")]
     [ApiController]
-    public class RickAndMorty : ControllerBase
+    public class RickAndMortyController : ControllerBase
     {
-        // GET: api/<RickAndMorty>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IRickAndMortyService _rickAndMortyService;
+
+        public RickAndMortyController(IRickAndMortyService rickAndMortyService)
         {
-            return new string[] { "value1", "value2" };
+            _rickAndMortyService = rickAndMortyService;
         }
 
-        // GET api/<RickAndMorty>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("check-person")]
+        public async Task<IActionResult> CheckPerson([FromBody] ResponseCheckPerson request)
         {
-            return "value";
+            var result = await _rickAndMortyService.IsPresent(request);
+            return result != null ? Ok(result) : NotFound();
         }
 
-        // POST api/<RickAndMorty>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpGet("person")]
+        public async Task<IActionResult> GetHeroByName([FromQuery] string name)
         {
-        }
-
-        // PUT api/<RickAndMorty>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<RickAndMorty>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var result = await _rickAndMortyService.GetHeroByName(name);
+            return result != null ? Ok(result) : NotFound();
         }
     }
 }
